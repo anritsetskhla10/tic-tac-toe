@@ -8,7 +8,16 @@ import { useState } from "react";
 function App() {
   const [activePlayer, setActivePlayer] = useState("X");
   const [mode, setMode] = useState("solo");
-  const [turn, setTurn] = useState('x'); 
+  const [turn, setTurn] = useState("x");
+  const [reset, setReset] = useState(false);
+  const [scores, setScores] = useState({ x: 0, o: 0, ties: 0 });
+
+  const handleReset = () => {
+    setReset(true);
+    setScores({ x: 0, o: 0, ties: 0 });
+    setTimeout(() => setReset(false), 0); 
+  };
+
 
   return (
     <MainContainer>
@@ -25,9 +34,30 @@ function App() {
         />
         <Route
           path="/solo"
-          element={<Solo turn={turn} setTurn={setTurn} />}
+          element={
+            <Solo
+              turn={turn}
+              setTurn={setTurn}
+              reset={reset}
+              scores={scores}
+              setScores={setScores}
+              handleReset={handleReset}
+            />
+          }
         />
-        <Route path="/multiplayer" element={<Multiplayer turn={turn} setTurn={setTurn} />} />
+        <Route
+          path="/multiplayer"
+          element={
+            <Multiplayer
+              turn={turn}
+              setTurn={setTurn}
+              reset={reset}
+              scores={scores}
+              setScores={setScores}
+              handleReset={handleReset}
+            />
+          }
+        />
       </Routes>
     </MainContainer>
   );

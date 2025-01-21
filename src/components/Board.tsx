@@ -3,15 +3,39 @@ import PlayerX from "/images/icon-x.svg";
 import PlayerO from "/images/icon-o.svg";
 import PlayerXOut from "/images/icon-x-outline.svg";
 import PlayerOOut from "/images/icon-o-outline.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface BoardProps {
   turn: string;
   setTurn: React.Dispatch<React.SetStateAction<string>>;
+  reset: boolean;
+  scores: { x: number; o: number; ties: number };
+  setScores: React.Dispatch<React.SetStateAction<{ x: number; o: number; ties: number }>>;
 }
 
-function Board({ turn, setTurn }: BoardProps) {
+function Board({ turn, setTurn, reset, setScores }: BoardProps) {
   const [board, setBoard] = useState<string[]>(Array(9).fill(""));
+
+  const winningCombinations = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+
+  const checkWinner = () => {
+    for (const combo of winningCombinations) {
+      const [a, b, c] = combo;
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+        return board[a];
+      }
+    }
+    return board.every((cell) => cell) ? "tie" : null;
+  };
 
   const handleClick = (index: number) => {
     if (board[index]) return;
@@ -20,8 +44,28 @@ function Board({ turn, setTurn }: BoardProps) {
     newBoard[index] = turn;
     setBoard(newBoard);
 
-    setTurn(turn === "x" ? "o" : "x");
+    const winner = checkWinner();
+    if (winner) {
+      setTimeout(() => {
+        if (winner === "tie") {
+          setScores((prev) => ({ ...prev, ties: prev.ties + 1 }));
+        } else if (winner === "x" || winner === "o") {
+          setScores((prev) => ({ ...prev, [winner]: prev[winner] + 1 }));
+        }
+        setBoard(Array(9).fill(""));
+        setTurn("x");
+      }, 500);
+    } else {
+      setTurn(turn === "x" ? "o" : "x");
+    }
   };
+
+  useEffect(() => {
+    if (reset) {
+      setBoard(Array(9).fill(""));
+      setTurn("x");
+    }
+  }, [reset, setTurn]);
 
   return (
     <BoardContainer>
@@ -86,3 +130,4 @@ const Cell = styled.div<CellProps>`
     }
   `}
 `;
+

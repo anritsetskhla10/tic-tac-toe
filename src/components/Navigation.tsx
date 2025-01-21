@@ -1,36 +1,34 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
-
-interface NavigationProps{
-    turn : string
+interface NavigationProps {
+  turn: string;
+  onReset: () => void;
 }
 
-function Navigation({turn} : NavigationProps) {
-
-
+function Navigation({ turn, onReset }: NavigationProps) {
   return (
     <NavContainer>
       <button>
-      <img className="logo" src="/images/logo.svg" alt="logo icon" />
+        <img className="logo" src="/images/logo.svg" alt="logo icon" />
       </button>
       <div>
-        <img src={turn === 'x' ? '/images/icon-x.svg' : '/images/icon-o.svg'} alt="players icon" />
+        <img
+          src={turn === "x" ? "/images/icon-x.svg" : "/images/icon-o.svg"}
+          alt={`${turn.toUpperCase()} player's turn`}
+        />
         <span>TURN</span>
       </div>
-        <button>
+      <button onClick={onReset}>
         <img className="restart" src="/images/icon-restart.svg" alt="restart icon" />
-        </button>
+      </button>
     </NavContainer>
-  )
+  );
 }
 
-export default Navigation
-
-
+export default Navigation;
 
 const NavContainer = styled.div`
-    
-    display: flex;
+  display: flex;
     flex-direction: row;
     align-items: center;
     margin-bottom: 64px;
@@ -76,6 +74,5 @@ const NavContainer = styled.div`
             letter-spacing: 0.88px;
             color: #a8bfc9;
         }
-    }
-
-`
+  }
+`;

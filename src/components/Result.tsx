@@ -1,62 +1,67 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
+interface ResultProps {
+  scores: {
+    x: number;
+    o: number;
+    ties: number;
+  };
+}
 
-function Result() {
+function Result({ scores }: ResultProps) {
   return (
     <ResultContainer>
       <div className="player1">
-        <span>X ({})</span>
-        <p>0</p>
+        <span>X ({scores.x})</span>
+        <p>{scores.x}</p>
       </div>
       <div className="result">
         <span>TIES</span>
-        <p>0</p>
+        <p>{scores.ties}</p>
       </div>
       <div className="player2">
-        <span>O ({})</span>
-        <p>0</p>
+        <span>O ({scores.o})</span>
+        <p>{scores.o}</p>
       </div>
     </ResultContainer>
-  )
+  );
 }
 
-export default Result
-
-
+export default Result;
 
 const ResultContainer = styled.div`
-  
   display: flex;
-  flex-direction: row;
-  align-items: center;
   gap: 20px;
   padding: 0 24px;
 
-
-  .player1{
+  div {
     width: 96px;
     height: 64px;
     padding: 12px 0;
     border-radius: 15px;
-    background-color: #31c3bd;
     text-align: center;
-  }
+    color: #ffffff;
 
-  .result{
-    width: 96px;
-    height: 64px;
-    padding: 12px 0;
-    border-radius: 15px;
-    background-color: #a8bfc9;
-    text-align: center;
-  }
+    &.player1 {
+      background-color: #31c3bd;
+    }
 
-  .player2{
-    width: 96px;
-    height: 64px;
-    padding: 12px 0;
-    border-radius: 15px;
-    background-color: #f2b137;
-    text-align: center;
+    &.result {
+      background-color: #a8bfc9;
+    }
+
+    &.player2 {
+      background-color: #f2b137;
+    }
+
+    span {
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    p {
+      font-size: 24px;
+      margin: 0;
+    }
   }
-`
+`;
