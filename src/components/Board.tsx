@@ -11,9 +11,10 @@ interface BoardProps {
   reset: boolean;
   scores: { x: number; o: number; ties: number };
   setScores: React.Dispatch<React.SetStateAction<{ x: number; o: number; ties: number }>>;
+  mode: string;
 }
 
-function Board({ turn, setTurn, reset, setScores }: BoardProps) {
+function Board({ turn, setTurn, reset, setScores, mode }: BoardProps) {
   const [board, setBoard] = useState<string[]>(Array(9).fill(""));
 
   const winningCombinations = [
@@ -38,7 +39,7 @@ function Board({ turn, setTurn, reset, setScores }: BoardProps) {
   };
 
   const handleClick = (index: number) => {
-    if (board[index]) return;
+    if (board[index] || (turn === "o" && mode === "solo")) return;
 
     const newBoard = [...board];
     newBoard[index] = turn;
@@ -46,17 +47,42 @@ function Board({ turn, setTurn, reset, setScores }: BoardProps) {
 
     const winner = checkWinner();
     if (winner) {
-      setTimeout(() => {
-        if (winner === "tie") {
-          setScores((prev) => ({ ...prev, ties: prev.ties + 1 }));
-        } else if (winner === "x" || winner === "o") {
-          setScores((prev) => ({ ...prev, [winner]: prev[winner] + 1 }));
-        }
-        setBoard(Array(9).fill(""));
-        setTurn("x");
-      }, 500);
+      handleGameOver(winner);
     } else {
       setTurn(turn === "x" ? "o" : "x");
+    }
+  };
+
+  const handleGameOver = (winner: string) => {
+    setTimeout(() => {
+      if (winner === "tie") {
+        setScores((prev) => ({ ...prev, ties: prev.ties + 1 }));
+      } else if (winner === "x" || winner === "o") {
+        setScores((prev) => ({ ...prev, [winner]: prev[winner] + 1 }));
+      }
+      setBoard(Array(9).fill(""));
+      setTurn("x");
+    }, 500);
+  };
+
+  const cpuMove = () => {
+    const emptyCells = board
+      .map((cell, index) => (cell === "" ? index : null))
+      .filter((i) => i !== null) as number[];
+
+    if (emptyCells.length === 0) return;
+
+    // Pick a random empty cell for simplicity
+    const randomIndex = Math.floor(Math.random() * emptyCells.length);
+    const newBoard = [...board];
+    newBoard[emptyCells[randomIndex]] = "o"; // CPU is always "o"
+    setBoard(newBoard);
+
+    const winner = checkWinner();
+    if (winner) {
+      handleGameOver(winner);
+    } else {
+      setTurn("x");
     }
   };
 
@@ -67,19 +93,28 @@ function Board({ turn, setTurn, reset, setScores }: BoardProps) {
     }
   }, [reset, setTurn]);
 
+  useEffect(() => {
+    if (turn === "o" && mode === "solo") {
+      const timeout = setTimeout(cpuMove, 500);
+      return () => clearTimeout(timeout);
+    }
+  }, [turn, mode]);
+
   return (
-    <BoardContainer>
-      {board.map((cell, index) => (
-        <Cell
-          key={index}
-          $isoccupied={!!cell}
-          $turn={turn}
-          onClick={() => handleClick(index)}
-        >
-          {cell && <img src={cell === "x" ? PlayerX : PlayerO} alt="player icon" />}
-        </Cell>
-      ))}
-    </BoardContainer>
+    <>
+      <BoardContainer>
+        {board.map((cell, index) => (
+          <Cell
+            key={index}
+            $isoccupied={!!cell}
+            $turn={turn}
+            onClick={() => handleClick(index)}
+          >
+            {cell && <img src={cell === "x" ? PlayerX : PlayerO} alt="player icon" />}
+          </Cell>
+        ))}
+      </BoardContainer>
+    </>
   );
 }
 
@@ -115,8 +150,7 @@ const Cell = styled.div<CellProps>`
 
   ${({ $isoccupied, $turn }) =>
     !$isoccupied &&
-    `
-    &:hover::before {
+    `&:hover::before {
       content: "";
       position: absolute;
       top: 50%;
@@ -127,7 +161,5 @@ const Cell = styled.div<CellProps>`
       background-image: url(${ $turn === "x" ? PlayerXOut : PlayerOOut });
       background-size: cover;
       opacity: 0.5;
-    }
-  `}
+    }`}
 `;
-

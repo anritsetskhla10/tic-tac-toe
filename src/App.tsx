@@ -32,19 +32,20 @@ function App() {
             />
           }
         />
-        <Route
-          path="/solo"
-          element={
-            <Solo
-              turn={turn}
-              setTurn={setTurn}
-              reset={reset}
-              scores={scores}
-              setScores={setScores}
-              handleReset={handleReset}
-            />
-          }
-        />
+       <Route
+        path="/solo"
+        element={
+          <Solo
+            turn={turn}
+            setTurn={setTurn}
+            reset={reset}
+            scores={scores}
+            setScores={setScores}
+            handleReset={handleReset}
+            mode={mode}
+          />
+        }
+      />
         <Route
           path="/multiplayer"
           element={
@@ -55,6 +56,7 @@ function App() {
               scores={scores}
               setScores={setScores}
               handleReset={handleReset}
+              mode={mode}
             />
           }
         />

@@ -10,9 +10,10 @@ interface SoloProps {
   scores: { x: number; o: number; ties: number };
   setScores: React.Dispatch<React.SetStateAction<{ x: number; o: number; ties: number }>>;
   handleReset: () => void;
+  mode: string;
 }
 
-function Solo({ turn, setTurn, reset, scores, setScores, handleReset}: SoloProps) {
+function Solo({ turn, setTurn, reset, scores, setScores, handleReset, mode}: SoloProps) {
 
 
   return (
@@ -24,6 +25,7 @@ function Solo({ turn, setTurn, reset, scores, setScores, handleReset}: SoloProps
         reset={reset}
         scores={scores}
         setScores={setScores}
+        mode={mode}
       />
       <Result scores={scores} />
     </SoloContainer>
