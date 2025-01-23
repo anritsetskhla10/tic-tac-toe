@@ -10,7 +10,7 @@ interface MenuProps{
 
 function Menu({activePlayer, setActivePlayer, setMode}:MenuProps) {
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handlePlayerClick = (player: "X" | "O") => {
     setActivePlayer(player);

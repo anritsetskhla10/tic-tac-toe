@@ -16,6 +16,7 @@ interface BoardProps {
 
 function Board({ turn, setTurn, reset, setScores, mode }: BoardProps) {
   const [board, setBoard] = useState<string[]>(Array(9).fill(""));
+  const [winningCells, setWinningCells] = useState<number[]>([]);
 
   const winningCombinations = [
     [0, 1, 2],
@@ -28,31 +29,37 @@ function Board({ turn, setTurn, reset, setScores, mode }: BoardProps) {
     [2, 4, 6],
   ];
 
-  const checkWinner = () => {
-    for (const combo of winningCombinations) {
-      const [a, b, c] = combo;
-      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-        return board[a];
-      }
-    }
-    return board.every((cell) => cell) ? "tie" : null;
-  };
-
   const handleClick = (index: number) => {
-    if (board[index] || (turn === "o" && mode === "solo")) return;
-
+    if (board[index]) return; // Prevent clicking an already occupied cell
+  
     const newBoard = [...board];
     newBoard[index] = turn;
     setBoard(newBoard);
-
-    const winner = checkWinner();
+  
+    const winner = checkWinner(newBoard);
     if (winner) {
       handleGameOver(winner);
     } else {
-      setTurn(turn === "x" ? "o" : "x");
+      setTurn(turn === "x" ? "o" : "x"); // Switch turn between players
     }
   };
-
+  
+  const checkWinner = (currentBoard: string[]) => {
+    for (const combo of winningCombinations) {
+      const [a, b, c] = combo;
+      if (currentBoard[a] && currentBoard[a] === currentBoard[b] && currentBoard[a] === currentBoard[c]) {
+        setWinningCells(combo);
+        return currentBoard[a];
+      }
+    }
+  
+    if (currentBoard.every((cell) => cell)) {
+      return "tie";
+    }
+  
+    return null;
+  };
+  
   const handleGameOver = (winner: string) => {
     setTimeout(() => {
       if (winner === "tie") {
@@ -60,25 +67,28 @@ function Board({ turn, setTurn, reset, setScores, mode }: BoardProps) {
       } else if (winner === "x" || winner === "o") {
         setScores((prev) => ({ ...prev, [winner]: prev[winner] + 1 }));
       }
+  
       setBoard(Array(9).fill(""));
+      setWinningCells([]);
       setTurn("x");
     }, 500);
   };
 
   const cpuMove = () => {
+    if (mode !== "solo") return; // Skip CPU move in multiplayer mode
+  
     const emptyCells = board
       .map((cell, index) => (cell === "" ? index : null))
       .filter((i) => i !== null) as number[];
-
+  
     if (emptyCells.length === 0) return;
-
-    // Pick a random empty cell for simplicity
+  
     const randomIndex = Math.floor(Math.random() * emptyCells.length);
     const newBoard = [...board];
     newBoard[emptyCells[randomIndex]] = "o"; // CPU is always "o"
     setBoard(newBoard);
-
-    const winner = checkWinner();
+  
+    const winner = checkWinner(newBoard);
     if (winner) {
       handleGameOver(winner);
     } else {
@@ -89,6 +99,7 @@ function Board({ turn, setTurn, reset, setScores, mode }: BoardProps) {
   useEffect(() => {
     if (reset) {
       setBoard(Array(9).fill(""));
+      setWinningCells([]);
       setTurn("x");
     }
   }, [reset, setTurn]);
@@ -101,24 +112,25 @@ function Board({ turn, setTurn, reset, setScores, mode }: BoardProps) {
   }, [turn, mode]);
 
   return (
-    <>
-      <BoardContainer>
-        {board.map((cell, index) => (
-          <Cell
-            key={index}
-            $isoccupied={!!cell}
-            $turn={turn}
-            onClick={() => handleClick(index)}
-          >
-            {cell && <img src={cell === "x" ? PlayerX : PlayerO} alt="player icon" />}
-          </Cell>
-        ))}
-      </BoardContainer>
-    </>
+    <BoardContainer>
+      {board.map((cell, index) => (
+        <Cell
+          key={index}
+          $isoccupied={!!cell}
+          $turn={turn}
+          $isWinning={winningCells.includes(index)}
+          onClick={() => handleClick(index)}
+        >
+          {cell && <img src={cell === "x" ? PlayerX : PlayerO} alt="player icon" />}
+        </Cell>
+      ))}
+    </BoardContainer>
   );
 }
 
 export default Board;
+
+// Styled Components
 
 const BoardContainer = styled.div`
   display: grid;
@@ -131,6 +143,7 @@ const BoardContainer = styled.div`
 interface CellProps {
   $isoccupied: boolean;
   $turn: string;
+  $isWinning: boolean;
 }
 
 const Cell = styled.div<CellProps>`
@@ -158,8 +171,15 @@ const Cell = styled.div<CellProps>`
       transform: translate(-50%, -50%);
       width: 40px;
       height: 40px;
-      background-image: url(${ $turn === "x" ? PlayerXOut : PlayerOOut });
+      background-image: url(${$turn === "x" ? PlayerXOut : PlayerOOut});
       background-size: cover;
       opacity: 0.5;
     }`}
+
+  ${({ $isWinning }) =>
+    $isWinning &&
+    `
+      box-shadow: 0 0 10px #ffd700;
+      background-color: #ffeb3b;
+    `}
 `;
