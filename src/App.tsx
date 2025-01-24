@@ -18,6 +18,7 @@ function App() {
     setTimeout(() => setReset(false), 0); 
   };
 
+  console.log(mode)
 
   return (
     <MainContainer>
@@ -32,20 +33,21 @@ function App() {
             />
           }
         />
-       <Route
-        path="/solo"
-        element={
-          <Solo
-            turn={turn}
-            setTurn={setTurn}
-            reset={reset}
-            scores={scores}
-            setScores={setScores}
-            handleReset={handleReset}
-            mode={mode}
+        <Route
+          path="/solo"
+          element={
+              <Solo
+                turn={turn}
+                setTurn={setTurn}
+                reset={reset}
+                scores={scores}
+                setScores={setScores}
+                handleReset={handleReset}
+                mode={mode}
+                activePlayer={activePlayer}
+              />
+            }
           />
-        }
-      />
         <Route
           path="/multiplayer"
           element={
@@ -57,6 +59,7 @@ function App() {
               setScores={setScores}
               handleReset={handleReset}
               mode={mode}
+              activePlayer={activePlayer}
             />
           }
         />

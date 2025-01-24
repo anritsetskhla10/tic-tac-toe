@@ -6,13 +6,21 @@ interface ResultProps {
     o: number;
     ties: number;
   };
+  mode: string; 
+  activePlayer: string; 
 }
 
-function Result({ scores }: ResultProps) {
+function Result({ scores, mode, activePlayer }: ResultProps) {
+  const player1Label = mode === "solo" ? (activePlayer === "X" ? "YOU" : "CPU") : "P1";
+  const player2Label = mode === "solo" ? (activePlayer === "O" ? "YOU" : "CPU") : "P2";
+
+  console.log(player1Label, player2Label);
+  console.log(mode);
+
   return (
     <ResultContainer>
       <div className="player1">
-        <span>X ({scores.x})</span>
+        <span>X ({player1Label})</span>
         <p>{scores.x}</p>
       </div>
       <div className="result">
@@ -20,7 +28,7 @@ function Result({ scores }: ResultProps) {
         <p>{scores.ties}</p>
       </div>
       <div className="player2">
-        <span>O ({scores.o})</span>
+        <span>O ({player2Label})</span>
         <p>{scores.o}</p>
       </div>
     </ResultContainer>

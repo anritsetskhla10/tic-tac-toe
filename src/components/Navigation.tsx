@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router";
 import styled from "styled-components";
 
 interface NavigationProps {
@@ -5,11 +6,20 @@ interface NavigationProps {
   onReset: () => void;
 }
 
+
+
 function Navigation({ turn, onReset }: NavigationProps) {
+
+    const navigate = useNavigate();
+
+  const openMenu = () => {
+    navigate('/');
+  }
+
   return (
     <NavContainer>
       <button>
-        <img className="logo" src="/images/logo.svg" alt="logo icon" />
+        <img className="logo" src="/images/logo.svg" alt="logo icon" onClick={openMenu} />
       </button>
       <div>
         <img
