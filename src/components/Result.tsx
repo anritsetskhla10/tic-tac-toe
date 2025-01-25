@@ -14,8 +14,6 @@ function Result({ scores, mode, activePlayer }: ResultProps) {
   const player1Label = mode === "solo" ? (activePlayer === "X" ? "YOU" : "CPU") : "P1";
   const player2Label = mode === "solo" ? (activePlayer === "O" ? "YOU" : "CPU") : "P2";
 
-  console.log(player1Label, player2Label);
-  console.log(mode);
 
   return (
     <ResultContainer>

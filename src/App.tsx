@@ -1,9 +1,10 @@
-import { Route, Routes } from "react-router";
+import { useState } from "react";
 import styled from "styled-components";
+import { Route, Routes } from "react-router";
 import Menu from "./view/Menu";
 import Solo from "./view/Solo";
 import Multiplayer from "./view/Multiplayer";
-import { useState } from "react";
+import RoundModal from "./components/RoundModal"; 
 
 function App() {
   const [activePlayer, setActivePlayer] = useState("X");
@@ -11,17 +12,29 @@ function App() {
   const [turn, setTurn] = useState("x");
   const [reset, setReset] = useState(false);
   const [scores, setScores] = useState({ x: 0, o: 0, ties: 0 });
+  const [showModal, setShowModal] = useState(false); 
+  const [winner, setWinner] = useState<string | null>(null);
 
   const handleReset = () => {
     setReset(true);
     setScores({ x: 0, o: 0, ties: 0 });
-    setTimeout(() => setReset(false), 0); 
+    setTimeout(() => setReset(false), 0);
   };
 
-  console.log(mode)
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setReset(true);
+  };
 
   return (
     <MainContainer>
+      {showModal && (
+        <RoundModal
+          winner={winner}
+          onClose={handleCloseModal}
+          setShowModal={setShowModal}
+        />
+      )}
       <Routes>
         <Route
           path="/"
@@ -36,18 +49,20 @@ function App() {
         <Route
           path="/solo"
           element={
-              <Solo
-                turn={turn}
-                setTurn={setTurn}
-                reset={reset}
-                scores={scores}
-                setScores={setScores}
-                handleReset={handleReset}
-                mode={mode}
-                activePlayer={activePlayer}
-              />
-            }
-          />
+            <Solo
+              turn={turn}
+              setTurn={setTurn}
+              reset={reset}
+              scores={scores}
+              setScores={setScores}
+              handleReset={handleReset}
+              mode={mode}
+              activePlayer={activePlayer}
+              setWinner={setWinner} // Pass setWinner
+              setShowModal={setShowModal} // Pass setShowModal
+            />
+          }
+        />
         <Route
           path="/multiplayer"
           element={
@@ -60,6 +75,8 @@ function App() {
               handleReset={handleReset}
               mode={mode}
               activePlayer={activePlayer}
+              setWinner={setWinner} // Pass setWinner
+              setShowModal={setShowModal} // Pass setShowModal
             />
           }
         />

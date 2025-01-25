@@ -12,9 +12,11 @@ interface SoloProps {
   handleReset: () => void;
   mode: string;
   activePlayer: string;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setWinner: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-function Solo({ turn, setTurn, reset, scores, setScores, handleReset, mode, activePlayer}: SoloProps) {
+function Solo({ turn, setTurn, reset, scores, setScores, handleReset, mode, activePlayer, setShowModal, setWinner}: SoloProps) {
 
   console.log(mode);
 
@@ -28,6 +30,8 @@ function Solo({ turn, setTurn, reset, scores, setScores, handleReset, mode, acti
         scores={scores}
         setScores={setScores}
         mode={mode}
+        setShowModal={setShowModal}
+        setWinner={setWinner}
       />
       <Result scores={scores} activePlayer={activePlayer} mode={mode}/>
     </SoloContainer>

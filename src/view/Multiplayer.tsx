@@ -12,9 +12,11 @@ interface MultiplayerProps {
   handleReset: () => void;
   mode: string;
   activePlayer: string;
+  setWinner: React.Dispatch<React.SetStateAction<string | null>>;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function Multiplayer({ turn, setTurn, reset, scores, setScores, handleReset, mode, activePlayer}: MultiplayerProps) {
+function Multiplayer({ turn, setTurn, reset, scores, setScores, handleReset, mode, activePlayer, setShowModal, setWinner}: MultiplayerProps) {
 
   console.log(mode);
   return (
@@ -27,6 +29,8 @@ function Multiplayer({ turn, setTurn, reset, scores, setScores, handleReset, mod
         scores={scores}
         setScores={setScores}
         mode={mode}
+        setShowModal={setShowModal}
+        setWinner={setWinner}
       />
       <Result scores={scores} activePlayer={activePlayer} mode={mode} />
   </SoloContainer>

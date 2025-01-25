@@ -12,9 +12,11 @@ interface BoardProps {
   scores: { x: number; o: number; ties: number };
   setScores: React.Dispatch<React.SetStateAction<{ x: number; o: number; ties: number }>>;
   mode: string;
+  setWinner: React.Dispatch<React.SetStateAction<string | null>>;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function Board({ turn, setTurn, reset, setScores, mode }: BoardProps) {
+function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner }: BoardProps) {
   const [board, setBoard] = useState<string[]>(Array(9).fill(""));
   const [winningCells, setWinningCells] = useState<number[]>([]);
 
@@ -68,11 +70,11 @@ function Board({ turn, setTurn, reset, setScores, mode }: BoardProps) {
         setScores((prev) => ({ ...prev, [winner]: prev[winner] + 1 }));
       }
   
-      setBoard(Array(9).fill(""));
-      setWinningCells([]);
-      setTurn("x");
+      setWinner(winner); // Set winner
+      setShowModal(true); // Open modal
     }, 500);
   };
+  
 
   const cpuMove = () => {
     if (mode !== "solo") return; // Skip CPU move in multiplayer mode
