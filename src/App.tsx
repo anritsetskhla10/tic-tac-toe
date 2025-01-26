@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Route, Routes } from "react-router";
+import { Route, Routes, useNavigate } from "react-router";
 import Menu from "./view/Menu";
 import Solo from "./view/Solo";
 import Multiplayer from "./view/Multiplayer";
@@ -21,9 +21,15 @@ function App() {
     setTimeout(() => setReset(false), 0);
   };
 
+  const navigate = useNavigate();
+
   const handleCloseModal = () => {
-    setShowModal(false);
     setReset(true);
+    setShowModal(false);
+    setTurn("x");
+    setScores({ x: 0, o: 0, ties: 0 });
+    setTimeout(() => setReset(false), 0);
+    navigate("/");
   };
 
   return (
@@ -33,6 +39,7 @@ function App() {
           winner={winner}
           onClose={handleCloseModal}
           setShowModal={setShowModal}
+          setReset={setReset}
         />
       )}
       <Routes>

@@ -8,12 +8,15 @@ interface RoundModalProps {
   winner: string | null;
   onClose: () => void;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setReset: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function RoundModal({ winner, onClose, setShowModal}: RoundModalProps) {
+function RoundModal({ winner, onClose, setShowModal, setReset}: RoundModalProps) {
 
     const handleNextRound = () => {
         setShowModal(false);
+        setReset(true);
+        setTimeout(() => setReset(false), 0);
     }
 
   return (
@@ -26,16 +29,17 @@ function RoundModal({ winner, onClose, setShowModal}: RoundModalProps) {
             ? "PLAYER X WINS!"
             : "PLAYER O WINS!"}
         </h4>
-        <WinnerDiv>
+       { winner !== "tie" && winner && <WinnerDiv winner={winner}>
             <img
             src={winner === "x" ? PlayerX : PlayerO}
             alt="winner icon"
             />
             <h3>TAKES THE ROUND</h3>
         </WinnerDiv>
+      }
         <ButtonsContainer>
-            <Button onClick={onClose}>Quit</Button>
-            <Button onClick={handleNextRound}>Next Round</Button>
+            <button className="quitBtn" onClick={onClose}>Quit</button>
+            <button className="nextBtn" onClick={handleNextRound}>Next Round</button>
         </ButtonsContainer>
       </ModalContainer>
     </ModalOverlay>
@@ -48,7 +52,7 @@ const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 100vw;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
@@ -58,27 +62,21 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContainer = styled.div`
-  background: white;
+  width: 100vw;
+  background-color: #1f3641;
   padding: 20px;
   text-align: center;
-  border-radius: 10px;
-  width: 300px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  & h4 {
+    color: #a8bfc9;
+  }
 `;
 
-const Button = styled.button`
-  margin-top: 20px;
-  padding: 10px 20px;
-  background: #1f3641;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-`;
 
-const WinnerDiv = styled.div`
+const WinnerDiv = styled.div<{ winner: string }>`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -90,7 +88,7 @@ const WinnerDiv = styled.div`
     }
 
     & h3 {
-        color: #f2b137;
+        color: ${props => props.winner === "x" ? "#31c3bd" : "#f2b137"};
     }
 `;
 
@@ -98,4 +96,31 @@ const ButtonsContainer = styled.div`
     display: flex;
     gap: 20px;
     justify-content: center;
+
+   .quitBtn{
+      margin-top: 20px;
+      padding: 10px 20px;
+      box-shadow: inset 0 -4px 0 0 #6b8997;
+      background-color: #a8bfc9;
+      color: #1a2a33;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+     cursor: pointer;
+   }
+
+   .nextBtn{
+      margin-top: 20px;
+      padding: 10px 20px;
+      box-shadow: inset 0 -4px 0 0 #cc8b13;
+      background-color: #f2b137;
+      color: #1a2a33;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+   }
+
 `;
