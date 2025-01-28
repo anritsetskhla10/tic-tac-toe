@@ -4,7 +4,7 @@ import { Route, Routes, useNavigate } from "react-router";
 import Menu from "./view/Menu";
 import Solo from "./view/Solo";
 import Multiplayer from "./view/Multiplayer";
-import RoundModal from "./components/RoundModal"; 
+import RoundModal from "./components/RoundModal";
 
 function App() {
   const [activePlayer, setActivePlayer] = useState("X");
@@ -12,16 +12,16 @@ function App() {
   const [turn, setTurn] = useState("x");
   const [reset, setReset] = useState(false);
   const [scores, setScores] = useState({ x: 0, o: 0, ties: 0 });
-  const [showModal, setShowModal] = useState(false); 
+  const [showModal, setShowModal] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const handleReset = () => {
     setReset(true);
     setScores({ x: 0, o: 0, ties: 0 });
     setTimeout(() => setReset(false), 0);
   };
-
-  const navigate = useNavigate();
 
   const handleCloseModal = () => {
     setReset(true);
@@ -65,7 +65,7 @@ function App() {
               handleReset={handleReset}
               mode={mode}
               activePlayer={activePlayer}
-              setWinner={setWinner} 
+              setWinner={setWinner}
               setShowModal={setShowModal}
             />
           }
@@ -82,8 +82,8 @@ function App() {
               handleReset={handleReset}
               mode={mode}
               activePlayer={activePlayer}
-              setWinner={setWinner} 
-              setShowModal={setShowModal} 
+              setWinner={setWinner}
+              setShowModal={setShowModal}
             />
           }
         />

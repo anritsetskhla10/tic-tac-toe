@@ -17,7 +17,16 @@ interface BoardProps {
   activePlayer: string;
 }
 
-function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner , activePlayer}: BoardProps) {
+function Board({
+  turn,
+  setTurn,
+  reset,
+  setScores,
+  mode,
+  setShowModal,
+  setWinner,
+  activePlayer,
+}: BoardProps) {
   const [board, setBoard] = useState<string[]>(Array(9).fill(""));
   const [winningCells, setWinningCells] = useState<number[]>([]);
   const [cpuPlayer, setCpuPlayer] = useState<string>("o");
@@ -39,19 +48,19 @@ function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner 
 
   const handleClick = (index: number) => {
     if (board[index]) return;
-  
+
     const newBoard = [...board];
     newBoard[index] = turn;
     setBoard(newBoard);
-  
+
     const winner = checkWinner(newBoard);
     if (winner) {
       handleGameOver(winner);
     } else {
-      setTurn(turn === "x" ? "o" : "x"); 
+      setTurn(turn === "x" ? "o" : "x");
     }
   };
-  
+
   const checkWinner = (currentBoard: string[]) => {
     for (const combo of winningCombinations) {
       const [a, b, c] = combo;
@@ -60,14 +69,14 @@ function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner 
         return currentBoard[a];
       }
     }
-  
+
     if (currentBoard.every((cell) => cell)) {
       return "tie";
     }
-  
+
     return null;
   };
-  
+
   const handleGameOver = (winner: string) => {
     setTimeout(() => {
       if (winner === "tie") {
@@ -75,33 +84,91 @@ function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner 
       } else if (winner === "x" || winner === "o") {
         setScores((prev) => ({ ...prev, [winner]: prev[winner] + 1 }));
       }
-  
-      setWinner(winner); 
-      setShowModal(true); 
+
+      setWinner(winner);
+      setShowModal(true);
     }, 500);
   };
-  
 
   const cpuMove = () => {
     if (mode !== "solo") return;
   
-    const emptyCells = board
-      .map((cell, index) => (cell === "" ? index : null))
-      .filter((i) => i !== null) as number[];
+    // Clone the board and find the best move using minimax
+    const bestMove = findBestMove({ board, player: cpuPlayer });
+    if (bestMove !== -1) {
+      const newBoard = [...board];
+      newBoard[bestMove] = cpuPlayer;
+      setBoard(newBoard);
   
-    if (emptyCells.length === 0) return;
-  
-    const randomIndex = Math.floor(Math.random() * emptyCells.length);
-    const newBoard = [...board];
-    newBoard[emptyCells[randomIndex]] = cpuPlayer; 
-    setBoard(newBoard);
-  
-    const winner = checkWinner(newBoard);
-    if (winner) {
-      handleGameOver(winner);
-    } else {
-      setTurn(cpuPlayer === "x" ? "o" : "x");
+      const winner = checkWinner(newBoard);
+      if (winner) {
+        handleGameOver(winner);
+      } else {
+        setTurn(cpuPlayer === "x" ? "o" : "x");
+      }
     }
+  };
+  
+  // Minimax algorithm
+  interface MinimaxParams {
+    newBoard: string[];
+    depth: number;
+    isMaximizing: boolean;
+  }
+
+  const minimax = ({ newBoard, depth, isMaximizing }: MinimaxParams): number => {
+    const winner = checkWinner(newBoard);
+    if (winner === cpuPlayer) return 10 - depth; // CPU wins, subtract depth to prioritize faster wins
+    if (winner === (cpuPlayer === "x" ? "o" : "x")) return depth - 10; // Player wins, prioritize CPU delay
+    if (newBoard.every((cell) => cell)) return 0; // Tie
+
+    if (isMaximizing) {
+      let bestScore = -Infinity;
+      for (let i = 0; i < newBoard.length; i++) {
+        if (!newBoard[i]) {
+          newBoard[i] = cpuPlayer; // Simulate CPU move
+          const score = minimax({ newBoard, depth: depth + 1, isMaximizing: false });
+          newBoard[i] = ""; // Undo move
+          bestScore = Math.max(score, bestScore);
+        }
+      }
+      return bestScore;
+    } else {
+      let bestScore = Infinity;
+      const opponent = cpuPlayer === "x" ? "o" : "x";
+      for (let i = 0; i < newBoard.length; i++) {
+        if (!newBoard[i]) {
+          newBoard[i] = opponent; // Simulate player's move
+          const score = minimax({ newBoard, depth: depth + 1, isMaximizing: true });
+          newBoard[i] = ""; // Undo move
+          bestScore = Math.min(score, bestScore);
+        }
+      }
+      return bestScore;
+    }
+  };
+  
+  // Find the best move for the CPU
+  interface FindBestMoveParams {
+    board: string[];
+    player: string;
+  }
+
+  const findBestMove = ({ board, player }: FindBestMoveParams): number => {
+    let bestScore = -Infinity;
+    let bestMove = -1;
+    for (let i = 0; i < board.length; i++) {
+      if (!board[i]) {
+        board[i] = player; // Simulate CPU move
+        const score = minimax({ newBoard: board, depth: 0, isMaximizing: false });
+        board[i] = ""; // Undo move
+        if (score > bestScore) {
+          bestScore = score;
+          bestMove = i;
+        }
+      }
+    }
+    return bestMove;
   };
   
 
@@ -114,11 +181,11 @@ function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner 
   }, [reset, setTurn]);
 
   useEffect(() => {
-    if (turn === "x" && mode === "solo") {
+    if (turn === cpuPlayer && mode === "solo") {
       const timeout = setTimeout(cpuMove, 500);
       return () => clearTimeout(timeout);
     }
-  }, [turn, mode,  cpuPlayer]);
+  }, [turn, mode, cpuPlayer]);
 
   return (
     <BoardContainer>
@@ -138,8 +205,6 @@ function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner 
 }
 
 export default Board;
-
-// Styled Components
 
 const BoardContainer = styled.div`
   display: grid;
