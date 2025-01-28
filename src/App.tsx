@@ -65,8 +65,8 @@ function App() {
               handleReset={handleReset}
               mode={mode}
               activePlayer={activePlayer}
-              setWinner={setWinner} // Pass setWinner
-              setShowModal={setShowModal} // Pass setShowModal
+              setWinner={setWinner} 
+              setShowModal={setShowModal}
             />
           }
         />
@@ -82,8 +82,8 @@ function App() {
               handleReset={handleReset}
               mode={mode}
               activePlayer={activePlayer}
-              setWinner={setWinner} // Pass setWinner
-              setShowModal={setShowModal} // Pass setShowModal
+              setWinner={setWinner} 
+              setShowModal={setShowModal} 
             />
           }
         />

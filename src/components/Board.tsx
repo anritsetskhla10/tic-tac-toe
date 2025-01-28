@@ -14,11 +14,17 @@ interface BoardProps {
   mode: string;
   setWinner: React.Dispatch<React.SetStateAction<string | null>>;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  activePlayer: string;
 }
 
-function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner }: BoardProps) {
+function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner , activePlayer}: BoardProps) {
   const [board, setBoard] = useState<string[]>(Array(9).fill(""));
   const [winningCells, setWinningCells] = useState<number[]>([]);
+  const [cpuPlayer, setCpuPlayer] = useState<string>("o");
+
+  useEffect(() => {
+    setCpuPlayer(activePlayer === "x" ? "o" : "x");
+  }, [activePlayer]);
 
   const winningCombinations = [
     [0, 1, 2],
@@ -32,7 +38,7 @@ function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner 
   ];
 
   const handleClick = (index: number) => {
-    if (board[index]) return; // Prevent clicking an already occupied cell
+    if (board[index]) return;
   
     const newBoard = [...board];
     newBoard[index] = turn;
@@ -42,7 +48,7 @@ function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner 
     if (winner) {
       handleGameOver(winner);
     } else {
-      setTurn(turn === "x" ? "o" : "x"); // Switch turn between players
+      setTurn(turn === "x" ? "o" : "x"); 
     }
   };
   
@@ -70,14 +76,14 @@ function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner 
         setScores((prev) => ({ ...prev, [winner]: prev[winner] + 1 }));
       }
   
-      setWinner(winner); // Set winner
-      setShowModal(true); // Open modal
+      setWinner(winner); 
+      setShowModal(true); 
     }, 500);
   };
   
 
   const cpuMove = () => {
-    if (mode !== "solo") return; // Skip CPU move in multiplayer mode
+    if (mode !== "solo") return;
   
     const emptyCells = board
       .map((cell, index) => (cell === "" ? index : null))
@@ -87,16 +93,17 @@ function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner 
   
     const randomIndex = Math.floor(Math.random() * emptyCells.length);
     const newBoard = [...board];
-    newBoard[emptyCells[randomIndex]] = "o"; // CPU is always "o"
+    newBoard[emptyCells[randomIndex]] = cpuPlayer; 
     setBoard(newBoard);
   
     const winner = checkWinner(newBoard);
     if (winner) {
       handleGameOver(winner);
     } else {
-      setTurn("x");
+      setTurn(cpuPlayer === "x" ? "o" : "x");
     }
   };
+  
 
   useEffect(() => {
     if (reset) {
@@ -107,11 +114,11 @@ function Board({ turn, setTurn, reset, setScores, mode, setShowModal, setWinner 
   }, [reset, setTurn]);
 
   useEffect(() => {
-    if (turn === "o" && mode === "solo") {
+    if (turn === "x" && mode === "solo") {
       const timeout = setTimeout(cpuMove, 500);
       return () => clearTimeout(timeout);
     }
-  }, [turn, mode]);
+  }, [turn, mode,  cpuPlayer]);
 
   return (
     <BoardContainer>

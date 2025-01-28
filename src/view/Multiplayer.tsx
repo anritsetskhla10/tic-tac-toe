@@ -31,6 +31,7 @@ function Multiplayer({ turn, setTurn, reset, scores, setScores, handleReset, mod
         mode={mode}
         setShowModal={setShowModal}
         setWinner={setWinner}
+        activePlayer={activePlayer}
       />
       <Result scores={scores} activePlayer={activePlayer} mode={mode} />
   </SoloContainer>

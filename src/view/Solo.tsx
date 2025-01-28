@@ -32,6 +32,7 @@ function Solo({ turn, setTurn, reset, scores, setScores, handleReset, mode, acti
         mode={mode}
         setShowModal={setShowModal}
         setWinner={setWinner}
+        activePlayer={activePlayer}
       />
       <Result scores={scores} activePlayer={activePlayer} mode={mode}/>
     </SoloContainer>
