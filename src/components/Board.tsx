@@ -1,9 +1,9 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import PlayerX from "/images/icon-x.svg";
 import PlayerO from "/images/icon-o.svg";
 import PlayerXOut from "/images/icon-x-outline.svg";
 import PlayerOOut from "/images/icon-o-outline.svg";
-import { useEffect, useState } from "react";
 
 interface BoardProps {
   turn: string;
@@ -28,7 +28,7 @@ function Board({
   activePlayer,
 }: BoardProps) {
   const [board, setBoard] = useState<string[]>(Array(9).fill(""));
-  const [winningCells, setWinningCells] = useState<number[]>([]);
+  const [winningCells, setWinningCells] = useState<number[]>([]); // Tracks winning cells
   const [cpuPlayer, setCpuPlayer] = useState<string>("o");
 
   useEffect(() => {
@@ -47,7 +47,7 @@ function Board({
   ];
 
   const handleClick = (index: number) => {
-    if (board[index]) return;
+    if (board[index] || winningCells.length > 0) return; // Ignore clicks if there's already a winner
 
     const newBoard = [...board];
     newBoard[index] = turn;
@@ -61,24 +61,25 @@ function Board({
     }
   };
 
+  // This function only checks the winner and sets the winning combination when the game ends
   const checkWinner = (currentBoard: string[]) => {
     for (const combo of winningCombinations) {
       const [a, b, c] = combo;
       if (currentBoard[a] && currentBoard[a] === currentBoard[b] && currentBoard[a] === currentBoard[c]) {
-        setWinningCells(combo);
-        return currentBoard[a];
+        return currentBoard[a]; // Return the winner
       }
     }
 
     if (currentBoard.every((cell) => cell)) {
-      return "tie";
+      return "tie"; // It's a tie if all cells are occupied
     }
 
-    return null;
+    return null; // No winner yet
   };
 
   const handleGameOver = (winner: string) => {
     setTimeout(() => {
+      // Update scores
       if (winner === "tie") {
         setScores((prev) => ({ ...prev, ties: prev.ties + 1 }));
       } else if (winner === "x" || winner === "o") {
@@ -86,20 +87,37 @@ function Board({
       }
 
       setWinner(winner);
-      setShowModal(true);
-    }, 500);
+
+      // If there's a winner, set the winning combination after the game ends
+      if (winner !== "tie") {
+        const winningCombo = getWinningCombination();
+        setWinningCells(winningCombo);
+      }
+
+      setShowModal(true); // Show modal at the end
+    }, 500); // Delay showing modal for better UX
+  };
+
+  // Get the winning combination of cells
+  const getWinningCombination = () => {
+    for (const combo of winningCombinations) {
+      const [a, b, c] = combo;
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+        return combo; // Return the winning combination
+      }
+    }
+    return [];
   };
 
   const cpuMove = () => {
     if (mode !== "solo") return;
-  
-    // Clone the board and find the best move using minimax
+
     const bestMove = findBestMove({ board, player: cpuPlayer });
     if (bestMove !== -1) {
       const newBoard = [...board];
       newBoard[bestMove] = cpuPlayer;
       setBoard(newBoard);
-  
+
       const winner = checkWinner(newBoard);
       if (winner) {
         handleGameOver(winner);
@@ -108,8 +126,8 @@ function Board({
       }
     }
   };
-  
-  // Minimax algorithm
+
+  // Minimax algorithm to find best CPU move
   interface MinimaxParams {
     newBoard: string[];
     depth: number;
@@ -118,17 +136,17 @@ function Board({
 
   const minimax = ({ newBoard, depth, isMaximizing }: MinimaxParams): number => {
     const winner = checkWinner(newBoard);
-    if (winner === cpuPlayer) return 10 - depth; // CPU wins, subtract depth to prioritize faster wins
-    if (winner === (cpuPlayer === "x" ? "o" : "x")) return depth - 10; // Player wins, prioritize CPU delay
+    if (winner === cpuPlayer) return 10 - depth;
+    if (winner === (cpuPlayer === "x" ? "o" : "x")) return depth - 10;
     if (newBoard.every((cell) => cell)) return 0; // Tie
 
     if (isMaximizing) {
       let bestScore = -Infinity;
       for (let i = 0; i < newBoard.length; i++) {
         if (!newBoard[i]) {
-          newBoard[i] = cpuPlayer; // Simulate CPU move
+          newBoard[i] = cpuPlayer;
           const score = minimax({ newBoard, depth: depth + 1, isMaximizing: false });
-          newBoard[i] = ""; // Undo move
+          newBoard[i] = "";
           bestScore = Math.max(score, bestScore);
         }
       }
@@ -138,16 +156,16 @@ function Board({
       const opponent = cpuPlayer === "x" ? "o" : "x";
       for (let i = 0; i < newBoard.length; i++) {
         if (!newBoard[i]) {
-          newBoard[i] = opponent; // Simulate player's move
+          newBoard[i] = opponent;
           const score = minimax({ newBoard, depth: depth + 1, isMaximizing: true });
-          newBoard[i] = ""; // Undo move
+          newBoard[i] = "";
           bestScore = Math.min(score, bestScore);
         }
       }
       return bestScore;
     }
   };
-  
+
   // Find the best move for the CPU
   interface FindBestMoveParams {
     board: string[];
@@ -159,9 +177,9 @@ function Board({
     let bestMove = -1;
     for (let i = 0; i < board.length; i++) {
       if (!board[i]) {
-        board[i] = player; // Simulate CPU move
+        board[i] = player;
         const score = minimax({ newBoard: board, depth: 0, isMaximizing: false });
-        board[i] = ""; // Undo move
+        board[i] = "";
         if (score > bestScore) {
           bestScore = score;
           bestMove = i;
@@ -170,7 +188,6 @@ function Board({
     }
     return bestMove;
   };
-  
 
   useEffect(() => {
     if (reset) {
@@ -218,6 +235,7 @@ interface CellProps {
   $isoccupied: boolean;
   $turn: string;
   $isWinning: boolean;
+  $winner?: string;
 }
 
 const Cell = styled.div<CellProps>`
