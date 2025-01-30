@@ -23,7 +23,7 @@ function Navigation({ turn, onReset }: NavigationProps) {
       </button>
       <div>
         <img
-          src={turn === "x" ? "/images/icon-x.svg" : "/images/icon-o.svg"}
+          src={turn === "X" ? "/images/icon-x.svg" : "/images/icon-o.svg"}
           alt={`${turn.toUpperCase()} player's turn`}
         />
         <span>TURN</span>

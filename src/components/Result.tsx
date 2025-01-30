@@ -2,8 +2,8 @@ import styled from "styled-components";
 
 interface ResultProps {
   scores: {
-    x: number;
-    o: number;
+    X: number;
+    O: number;
     ties: number;
   };
   mode: string; 
@@ -19,7 +19,7 @@ function Result({ scores, mode, activePlayer }: ResultProps) {
     <ResultContainer>
       <div className="player1">
         <span>X ({player1Label})</span>
-        <p>{scores.x}</p>
+        <p>{scores.X}</p>
       </div>
       <div className="result">
         <span>TIES</span>
@@ -27,7 +27,7 @@ function Result({ scores, mode, activePlayer }: ResultProps) {
       </div>
       <div className="player2">
         <span>O ({player2Label})</span>
-        <p>{scores.o}</p>
+        <p>{scores.O}</p>
       </div>
     </ResultContainer>
   );

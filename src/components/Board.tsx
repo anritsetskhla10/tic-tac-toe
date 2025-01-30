@@ -9,12 +9,13 @@ interface BoardProps {
   turn: string;
   setTurn: React.Dispatch<React.SetStateAction<string>>;
   reset: boolean;
-  scores: { x: number; o: number; ties: number };
-  setScores: React.Dispatch<React.SetStateAction<{ x: number; o: number; ties: number }>>;
+  scores: { X: number; O: number; ties: number };
+  setScores: React.Dispatch<React.SetStateAction<{ X: number; O: number; ties: number }>>;
   mode: string;
   setWinner: React.Dispatch<React.SetStateAction<string | null>>;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   activePlayer: string;
+  cpuPlayer: string;
 }
 
 function Board({
@@ -26,14 +27,23 @@ function Board({
   setShowModal,
   setWinner,
   activePlayer,
+  cpuPlayer
 }: BoardProps) {
   const [board, setBoard] = useState<string[]>(Array(9).fill(""));
-  const [winningCells, setWinningCells] = useState<number[]>([]); // Tracks winning cells
-  const [cpuPlayer, setCpuPlayer] = useState<string>("o");
+  const [winningCells, setWinningCells] = useState<number[]>([]); 
 
+  console.log(activePlayer)
+  console.log(cpuPlayer)
+
+
+  // Logic for CPU move based on who plays first
   useEffect(() => {
-    setCpuPlayer(activePlayer === "x" ? "o" : "x");
-  }, [activePlayer]);
+    if (cpuPlayer === "X" && !board.some(cell => cell)) {
+      cpuMove(); // CPU move if 'x' and it's the first move
+    } else if (activePlayer === "X" && !board.some(cell => cell)) {
+      setTurn("X"); // Set human player 'x' to make the first move
+    }
+  }, [cpuPlayer, activePlayer, board]);
 
   const winningCombinations = [
     [0, 1, 2],
@@ -57,7 +67,7 @@ function Board({
     if (winner) {
       handleGameOver(winner);
     } else {
-      setTurn(turn === "x" ? "o" : "x");
+      setTurn(turn === "X" ? "O" : "X");
     }
   };
 
@@ -82,7 +92,7 @@ function Board({
       // Update scores
       if (winner === "tie") {
         setScores((prev) => ({ ...prev, ties: prev.ties + 1 }));
-      } else if (winner === "x" || winner === "o") {
+      } else if (winner === "X" || winner === "O") {
         setScores((prev) => ({ ...prev, [winner]: prev[winner] + 1 }));
       }
 
@@ -122,7 +132,7 @@ function Board({
       if (winner) {
         handleGameOver(winner);
       } else {
-        setTurn(cpuPlayer === "x" ? "o" : "x");
+        setTurn(cpuPlayer === "X" ? "O" : "X");
       }
     }
   };
@@ -137,7 +147,7 @@ function Board({
   const minimax = ({ newBoard, depth, isMaximizing }: MinimaxParams): number => {
     const winner = checkWinner(newBoard);
     if (winner === cpuPlayer) return 10 - depth;
-    if (winner === (cpuPlayer === "x" ? "o" : "x")) return depth - 10;
+    if (winner === (cpuPlayer === "X" ? "O" : "X")) return depth - 10;
     if (newBoard.every((cell) => cell)) return 0; // Tie
 
     if (isMaximizing) {
@@ -153,7 +163,7 @@ function Board({
       return bestScore;
     } else {
       let bestScore = Infinity;
-      const opponent = cpuPlayer === "x" ? "o" : "x";
+      const opponent = cpuPlayer === "X" ? "O" : "X";
       for (let i = 0; i < newBoard.length; i++) {
         if (!newBoard[i]) {
           newBoard[i] = opponent;
@@ -193,7 +203,7 @@ function Board({
     if (reset) {
       setBoard(Array(9).fill(""));
       setWinningCells([]);
-      setTurn("x");
+      setTurn("X");
     }
   }, [reset, setTurn]);
 
@@ -214,7 +224,7 @@ function Board({
           $isWinning={winningCells.includes(index)}
           onClick={() => handleClick(index)}
         >
-          {cell && <img src={cell === "x" ? PlayerX : PlayerO} alt="player icon" />}
+          {cell && <img src={cell === "X" ? PlayerX : PlayerO} alt="player icon" />}
         </Cell>
       ))}
     </BoardContainer>
@@ -263,7 +273,7 @@ const Cell = styled.div<CellProps>`
       transform: translate(-50%, -50%);
       width: 40px;
       height: 40px;
-      background-image: url(${$turn === "x" ? PlayerXOut : PlayerOOut});
+      background-image: url(${$turn === "X" ? PlayerXOut : PlayerOOut});
       background-size: cover;
       opacity: 0.5;
     }`}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Route, Routes, useNavigate } from "react-router";
 import Menu from "./view/Menu";
@@ -8,10 +8,11 @@ import RoundModal from "./components/RoundModal";
 
 function App() {
   const [activePlayer, setActivePlayer] = useState("X");
+  const [cpuPlayer, setCpuPlayer] = useState<string>("");
   const [mode, setMode] = useState("solo");
-  const [turn, setTurn] = useState("x");
+  const [turn, setTurn] = useState("X");
   const [reset, setReset] = useState(false);
-  const [scores, setScores] = useState({ x: 0, o: 0, ties: 0 });
+  const [scores, setScores] = useState({ X: 0, O: 0, ties: 0 });
   const [showModal, setShowModal] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
 
@@ -19,18 +20,31 @@ function App() {
 
   const handleReset = () => {
     setReset(true);
-    setScores({ x: 0, o: 0, ties: 0 });
+    setScores({ X: 0, O: 0, ties: 0 });
     setTimeout(() => setReset(false), 0);
   };
 
   const handleCloseModal = () => {
     setReset(true);
     setShowModal(false);
-    setTurn("x");
-    setScores({ x: 0, o: 0, ties: 0 });
+    setTurn("X");
+    setScores({ X: 0, O: 0, ties: 0 });
     setTimeout(() => setReset(false), 0);
     navigate("/");
   };
+
+  
+    useEffect(() => {
+      // Set CPU player based on activePlayer
+      if (activePlayer === "X") {
+        setCpuPlayer("O"); 
+      } else {
+        setCpuPlayer("X"); 
+      }
+    }, [activePlayer]);
+
+    console.log(activePlayer);
+    console.log(cpuPlayer);
 
   return (
     <MainContainer>
@@ -65,6 +79,7 @@ function App() {
               handleReset={handleReset}
               mode={mode}
               activePlayer={activePlayer}
+              cpuPlayer={cpuPlayer}
               setWinner={setWinner}
               setShowModal={setShowModal}
             />
@@ -84,6 +99,7 @@ function App() {
               activePlayer={activePlayer}
               setWinner={setWinner}
               setShowModal={setShowModal}
+              cpuPlayer={cpuPlayer}
             />
           }
         />

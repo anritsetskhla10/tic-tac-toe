@@ -25,13 +25,13 @@ function RoundModal({ winner, onClose, setShowModal, setReset}: RoundModalProps)
         <h4>
           {winner === "tie"
             ? "ROUND TIED!"
-            : winner === "x"
+            : winner === "X"
             ? "PLAYER X WINS!"
             : "PLAYER O WINS!"}
         </h4>
        { winner !== "tie" && winner && <WinnerDiv winner={winner}>
             <img
-            src={winner === "x" ? PlayerX : PlayerO}
+            src={winner === "X" ? PlayerX : PlayerO}
             alt="winner icon"
             />
             <h3>TAKES THE ROUND</h3>
